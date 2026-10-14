@@ -12,6 +12,8 @@ export type BlogPost = {
   serviceLabel: string
 }
 
+export type BlogPostSummary = Pick<BlogPost, 'slug' | 'category' | 'title' | 'excerpt' | 'metaTitle' | 'metaDescription' | 'keywords'>
+
 export const blogPosts: BlogPost[] = [
   {
     slug: 'google-business-profile-checklist-local-businesses',

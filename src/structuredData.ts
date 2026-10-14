@@ -22,7 +22,7 @@ export function buildPageStructuredData(input: PageSchemaInput) {
     '@id': organizationId,
     name: 'CAP Technology',
     url: origin,
-    logo: { '@type': 'ImageObject', url: `${origin}/logo.png` },
+    logo: { '@type': 'ImageObject', url: `${origin}/logo.webp` },
     email: 'info@captechnology.in',
     description: 'Digital marketing services from CAP Technology in Viman Nagar, Pune.',
     address: {
