@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-type TrailDot = { x: number; y: number; life: number; size: number }
+type TrailDot = { x: number; y: number; life: number; size: number; hue: number }
 
 export default function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -15,6 +15,7 @@ export default function CursorTrail() {
     const dots: TrailDot[] = []
     let frame = 0
     let pixelRatio = 1
+    let hue = 0
 
     const resize = () => {
       pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5)
@@ -34,7 +35,7 @@ export default function CursorTrail() {
         }
         context.beginPath()
         context.arc(dot.x, dot.y, dot.size * dot.life, 0, Math.PI * 2)
-        context.fillStyle = `rgba(8, 169, 236, ${dot.life * 0.65})`
+        context.fillStyle = `hsla(${dot.hue}, 90%, 60%, ${dot.life * 0.68})`
         context.fill()
       }
       if (dots.length) frame = window.requestAnimationFrame(draw)
@@ -43,7 +44,8 @@ export default function CursorTrail() {
 
     const onPointerMove = (event: PointerEvent) => {
       if (event.pointerType === 'touch') return
-      dots.push({ x: event.clientX, y: event.clientY, life: 1, size: 2 + Math.random() * 2 })
+      dots.push({ x: event.clientX, y: event.clientY, life: 1, size: 2 + Math.random() * 2, hue })
+      hue = (hue + 42) % 360
       if (dots.length > 28) dots.shift()
       if (!frame) frame = window.requestAnimationFrame(draw)
     }
