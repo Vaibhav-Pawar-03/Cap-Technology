@@ -7,6 +7,8 @@ import DeferredSplashCursor from './DeferredSplashCursor'
 import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { ArrowDown, ArrowRight, ArrowUpRight, BarChart3, Check, ChevronDown, Globe2, Layers3, Menu, MousePointer2, PenTool, Search, Send, Sparkles, Target, TrendingUp, X } from 'lucide-react'
 
+const EMPTY_BLOG_POSTS: BlogPost[] = []
+
 const nav = [['Home','/'],['About','/about'],['Services','/services'],['Customers','/customers'],['Blog','/blog'],['Careers','/careers']]
 const services = [
   {n:'01',slug:'seo',icon:Search,title:'Search engine optimisation',desc:'A thoughtful SEO foundation that helps the right people find you through search.',tags:'Technical SEO  /  On-page  /  Local SEO'},
@@ -17,16 +19,16 @@ const services = [
   {n:'06',slug:'analytics-strategy',icon:BarChart3,title:'Analytics & strategy',desc:'Understand what’s working and where to focus next with useful measurement and honest insight.',tags:'Measurement  /  Audits  /  Planning'}
 ]
 
-function useBlogPosts(enabled = true) {
-  const [posts, setPosts] = useState<BlogPost[]>([])
+function useBlogPosts(enabled = true, initialPosts: BlogPost[] = EMPTY_BLOG_POSTS) {
+  const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || initialPosts.length) return
     let active = true
     import('./blogPosts').then(({ blogPosts }) => {
       if (active) setPosts(blogPosts)
     })
     return () => { active = false }
-  }, [enabled])
+  }, [enabled, initialPosts])
   return posts
 }
 
@@ -58,7 +60,7 @@ function ServiceDetail(){const {slug=''}=useParams();const item=services.find(s=
 function About(){return <main><PageHero label="A LITTLE ABOUT US" title="Small team." italic="Big on thought." body="CAP Technology is an independent digital marketing agency based in Viman Nagar, Pune. We help brands show up online with purpose, personality and a plan."/><section className="about-body"><div className="container about-grid"><Eyebrow>OUR APPROACH</Eyebrow><div><h2>Real people.<br/><em>Honest marketing.</em></h2><p>We believe good marketing begins with understanding. Your goals. Your customers. The things that make your business yours. From there, we bring strategy, creative thinking and digital know-how together to help you make your next move.</p><p>We keep the process collaborative, the communication clear and the work grounded in what we can genuinely deliver. Progress looks different for every business; we’d rather define it together than promise a number before we know your story.</p><Button to="/contact">Meet us where you are</Button></div></div></section><section className="values-section"><div className="container"><Eyebrow>WHAT WE BELIEVE</Eyebrow><div className="value-grid"><div><span>01</span><h3>Be curious</h3><p>Ask better questions. Keep learning. Never assume the first answer is the whole story.</p></div><div><span>02</span><h3>Stay honest</h3><p>Set clear expectations, show our working and say what we know-and what we don’t.</p></div><div><span>03</span><h3>Care about craft</h3><p>Make useful, considered work that respects people’s time and attention.</p></div></div></div></section></main>}
 function Customers(){return <main><PageHero label="CUSTOMERS & COLLABORATIONS" title="Good work." italic="Good people." body="A small selection of businesses we’ve had the pleasure of working alongside. We’re grateful for the trust and the chance to contribute."/><section className="customers-list"><div className="container"><article className="customer-card"><div className="customer-card-logo pay"><span>PayPerfectHR</span></div><div className="customer-card-copy"><Eyebrow>HR & PAYROLL</Eyebrow><h2>PayPerfectHR</h2><p>We’ve collaborated with PayPerfectHR, an HR and payroll-focused brand. Their website is <a href="https://payperfecthr.com" target="_blank" rel="noreferrer">payperfecthr.com <ArrowUpRight size={14}/></a>.</p><p className="factual-note">Company details and campaign outcomes are not published here unless verified and approved for sharing.</p></div><span className="customer-index">01</span></article><article className="customer-card"><div className="customer-card-logo meal"><span>mealqube</span><b>Good food, in your corner.</b></div><div className="customer-card-copy"><Eyebrow>FOOD & HOSPITALITY</Eyebrow><h2>Mealqube</h2><p>We’ve collaborated with Mealqube. Visit their website at <a href="https://mealqube.in" target="_blank" rel="noreferrer">mealqube.in <ArrowUpRight size={14}/></a>.</p><p className="factual-note">This listing reflects the relationship and website provided by CAP Technology; it is not a third-party endorsement or performance claim.</p></div><span className="customer-index">02</span></article><div className="customer-disclaimer">Customer names and links are shown as provided by CAP Technology. No performance figures or testimonials are claimed on this page.</div></div></section></main>}
 function Blog(){return <main><PageHero label="NOTES & IDEAS" title="A little more" italic="to think about." body="Practical, research-informed guides on search, planning, social content and useful websites for growing businesses."/><section className="blog-section"><div className="container blog-grid">{blogSummaries.map((post,i)=><article className="blog-card" key={post.slug}><div className={`blog-visual visual-${i+1}`}><span>{post.category}</span><ArrowUpRight/></div><div className="blog-body"><div className="blog-meta"><span>{post.category}</span><span>PRACTICAL GUIDE</span></div><h2><Link to={`/blog/${post.slug}`}>{post.title}</Link></h2><p>{post.excerpt}</p><Link to={`/blog/${post.slug}`}>Read the guide <ArrowRight size={15}/></Link></div></article>)}</div><div className="container editorial-note">Each guide is written to answer a specific question. Search visibility depends on competition, site quality and ongoing work; no ranking position is guaranteed.</div></section></main>}
-function BlogArticle(){const blogPosts=useBlogPosts();const {slug=''}=useParams();const post=blogPosts.find(item=>item.slug===slug);if(!post&&blogSummaries.some(item=>item.slug===slug)){const summary=blogSummaries.find(item=>item.slug===slug)!;return <main><PageHero label={summary.category} title={summary.title} italic="" body={summary.excerpt}/></main>}if(!post)return <main><PageHero label="ARTICLE NOT FOUND" title="Keep exploring." italic="Find a useful guide." body="That article may have moved. Browse the latest practical notes from CAP Technology."/><section className="blog-section"><div className="container"><Button to="/blog">View all articles</Button></div></section></main>;return <main><section className="page-hero blog-article-hero"><div className="container"><div className="breadcrumbs"><Link to="/">Home</Link><span>/</span><Link to="/blog">Blog</Link><span>/</span><span>{post.category}</span></div><Eyebrow>{post.category} / CAP TECHNOLOGY</Eyebrow><h1>{post.title}</h1><p>{post.excerpt}</p></div></section><section className="blog-article-section"><div className="container blog-article-layout"><article className="blog-article"><div className="blog-answer"><b>IN BRIEF</b><p>{post.excerpt}</p></div>{post.sections.map(section=><section key={section.heading}><h2>{section.heading}</h2>{section.paragraphs.map(paragraph=><p key={paragraph}>{paragraph}</p>)}{section.bullets&&<ul>{section.bullets.map(bullet=><li key={bullet}>{bullet}</li>)}</ul>}</section>)}<section className="blog-faq"><h2>Common questions</h2>{post.faq.map(item=><div key={item.question}><h3>{item.question}</h3><p>{item.answer}</p></div>)}</section><div className="blog-article-cta"><span>NEED HELP WITH THE NEXT STEP?</span><h2>Explore related support</h2><Link className="button" to={`/services/${post.serviceSlug}`}>{post.serviceLabel}<ArrowUpRight size={16}/></Link></div><Link className="blog-back" to="/blog"><ArrowRight size={16}/> Back to all articles</Link></article><aside className="blog-article-aside"><span>ABOUT THIS GUIDE</span><p>Prepared by CAP Technology for business owners and teams looking for practical digital marketing guidance.</p><div className="aside-rule"/><span>RELATED SERVICE</span><Link to={`/services/${post.serviceSlug}`}>{post.serviceLabel}<ArrowUpRight size={16}/></Link><div className="aside-rule"/><span>MORE FROM THE BLOG</span>{blogPosts.filter(item=>item.slug!==post.slug).slice(0,3).map(item=><Link className="related-article-link" key={item.slug} to={`/blog/${item.slug}`}>{item.title}<ArrowUpRight size={15}/></Link>)}</aside></div></section></main>}
+function BlogArticle({initialBlogPosts=EMPTY_BLOG_POSTS}:{initialBlogPosts?:BlogPost[]}){const blogPosts=useBlogPosts(true,initialBlogPosts);const {slug=''}=useParams();const post=blogPosts.find(item=>item.slug===slug);if(!post){const summary=blogSummaries.find(item=>item.slug===slug);if(summary)return <main><PageHero label={summary.category} title={summary.title} italic="" body={summary.excerpt}/></main>;return <main><PageHero label="ARTICLE NOT FOUND" title="Keep exploring." italic="Find a useful guide." body="That article may have moved. Browse the latest practical notes from CAP Technology."/><section className="blog-section"><div className="container"><Button to="/blog">View all articles</Button></div></section></main>}return <main><section className="page-hero blog-article-hero"><div className="container"><div className="breadcrumbs"><Link to="/">Home</Link><span>/</span><Link to="/blog">Blog</Link><span>/</span><span>{post.category}</span></div><Eyebrow>{post.category} / CAP TECHNOLOGY</Eyebrow><h1>{post.title}</h1><p>{post.excerpt}</p></div></section><section className="blog-article-section"><div className="container blog-article-layout"><article className="blog-article"><div className="blog-answer"><b>IN BRIEF</b><p>{post.excerpt}</p></div>{post.sections.map(section=><section key={section.heading}><h2>{section.heading}</h2>{section.paragraphs.map(paragraph=><p key={paragraph}>{paragraph}</p>)}{section.bullets&&<ul>{section.bullets.map(bullet=><li key={bullet}>{bullet}</li>)}</ul>}</section>)}<section className="blog-faq"><h2>Common questions</h2>{post.faq.map(item=><div key={item.question}><h3>{item.question}</h3><p>{item.answer}</p></div>)}</section><div className="blog-article-cta"><span>NEED HELP WITH THE NEXT STEP?</span><h2>Explore related support</h2><Link className="button" to={`/services/${post.serviceSlug}`}>{post.serviceLabel}<ArrowUpRight size={16}/></Link></div><Link className="blog-back" to="/blog"><ArrowRight size={16}/> Back to all articles</Link></article><aside className="blog-article-aside"><span>ABOUT THIS GUIDE</span><p>Prepared by CAP Technology for business owners and teams looking for practical digital marketing guidance.</p><div className="aside-rule"/><span>RELATED SERVICE</span><Link to={`/services/${post.serviceSlug}`}>{post.serviceLabel}<ArrowUpRight size={16}/></Link><div className="aside-rule"/><span>MORE FROM THE BLOG</span>{blogPosts.filter(item=>item.slug!==post.slug).slice(0,3).map(item=><Link className="related-article-link" key={item.slug} to={`/blog/${item.slug}`}>{item.title}<ArrowUpRight size={15}/></Link>)}</aside></div></section></main>}
 
 function Contact(){
  const [sent,setSent]=useState(false);const [sending,setSending]=useState(false);const [submitError,setSubmitError]=useState('');
@@ -85,7 +87,104 @@ const serviceSEO:Record<string,{title:string;description:string}>={
   'web-design-development':{title:'Website Design & Development Pune | CAP Technology',description:'Plan a responsive, accessible business website with CAP Technology in Pune. Explore web design, development and conversion-focused improvements.'},
   'analytics-strategy':{title:'Digital Marketing Strategy & Analytics Pune | CAP',description:'Make informed marketing decisions with measurement planning, analytics reviews and practical strategy support from CAP Technology in Pune.'}
 };
-function SEO(){const {pathname}=useLocation();const detailKey=pathname.split('/')[2];const detailItem=services.find(s=>s.slug===detailKey);const blogArticle=pathname.startsWith('/blog/')?blogSummaries.find(post=>post.slug===pathname.split('/')[2]):undefined;const data=blogArticle?{title:blogArticle.metaTitle,description:blogArticle.metaDescription}:detailItem?serviceSEO[detailKey]??{title:`${detailItem.title} in Pune | CAP Technology`,description:`Explore ${detailItem.title.toLowerCase()} services in Pune from CAP Technology. See what the work can include, how we approach it and whether it fits your business.`}:pageSEO[pathname]??pageSEO['/'];useEffect(()=>{document.title=data.title;const setMeta=(key:string,value:string,property=false)=>{const selector=property?`meta[property="${key}"]`:`meta[name="${key}"]`;let element=document.querySelector<HTMLMetaElement>(selector);if(!element){element=document.createElement('meta');if(property)element.setAttribute('property',key);else element.name=key;document.head.append(element)}element.content=value};setMeta('description',data.description);setMeta('og:title',data.title,true);setMeta('og:description',data.description,true);setMeta('og:type','website',true);setMeta('og:site_name','CAP Technology',true);setMeta('og:url',window.location.origin+pathname,true);setMeta('twitter:card','summary_large_image');setMeta('twitter:title',data.title);setMeta('twitter:description',data.description);let canonical=document.querySelector<HTMLLinkElement>('link[rel="canonical"]');if(!canonical){canonical=document.createElement('link');canonical.rel='canonical';document.head.append(canonical)}canonical.href=window.location.origin+pathname;const schema=buildPageStructuredData({origin:window.location.origin,pathname,title:data.title,description:data.description,serviceList:services.map(item=>({slug:item.slug,title:item.title,description:item.desc})),service:detailItem?{slug:detailItem.slug,title:detailItem.title,description:serviceDetails[detailKey]?.summary??detailItem.desc}:undefined,articles:blogSummaries.map(post=>({slug:post.slug,title:post.title,category:post.category,description:post.metaDescription,keywords:post.keywords})),article:blogArticle?{slug:blogArticle.slug,title:blogArticle.title,category:blogArticle.category,description:blogArticle.metaDescription,keywords:blogArticle.keywords}:undefined});let script=document.querySelector<HTMLScriptElement>('#cap-schema');if(!script){script=document.createElement('script');script.id='cap-schema';script.type='application/ld+json';document.head.append(script)}script.textContent=JSON.stringify(schema)},[pathname,data.title,data.description]);return null}
-function App(){const loc=useLocation(); return <><SEO/><DeferredSplashCursor/><div id="top"/><Header/><Routes><Route path="/" element={<Home/>}/><Route path="/about" element={<About/>}/><Route path="/services" element={<Services/>}/><Route path="/services/:slug" element={<ServiceDetail/>}/><Route path="/customers" element={<Customers/>}/><Route path="/blog/:slug" element={<BlogArticle/>}/><Route path="/blog" element={<Blog/>}/><Route path="/careers" element={<Careers/>}/><Route path="/contact" element={<Contact/>}/><Route path="*" element={<Home/>}/></Routes><Footer/><a href="#top" className="back-top" aria-label="Back to top"><MousePointer2 size={17}/></a>{loc.pathname==='/'&&<div className="floating-star" aria-hidden="true">*</div>}</>}
+export function getPageMetadata(pathname: string) {
+  const detailKey = pathname.split('/')[2]
+  const detailItem = services.find(item => item.slug === detailKey)
+  const article = pathname.startsWith('/blog/')
+    ? blogSummaries.find(post => post.slug === pathname.split('/')[2])
+    : undefined
+  return article
+    ? { title: article.metaTitle, description: article.metaDescription }
+    : detailItem
+      ? serviceSEO[detailKey] ?? {
+          title: `${detailItem.title} in Pune | CAP Technology`,
+          description: `Explore ${detailItem.title.toLowerCase()} services in Pune from CAP Technology. See what the work can include, how we approach it and whether it fits your business.`,
+        }
+      : pageSEO[pathname] ?? pageSEO['/']
+}
+
+export function getPageSchema(pathname: string, origin: string) {
+  const detailKey = pathname.split('/')[2]
+  const detailItem = services.find(item => item.slug === detailKey)
+  const article = pathname.startsWith('/blog/')
+    ? blogSummaries.find(post => post.slug === pathname.split('/')[2])
+    : undefined
+  const data = getPageMetadata(pathname)
+  return buildPageStructuredData({
+    origin,
+    pathname,
+    title: data.title,
+    description: data.description,
+    serviceList: services.map(item => ({ slug: item.slug, title: item.title, description: item.desc })),
+    service: detailItem ? {
+      slug: detailItem.slug,
+      title: detailItem.title,
+      description: serviceDetails[detailKey]?.summary ?? detailItem.desc,
+    } : undefined,
+    articles: blogSummaries.map(post => ({
+      slug: post.slug,
+      title: post.title,
+      category: post.category,
+      description: post.metaDescription,
+      keywords: post.keywords,
+    })),
+    article: article ? {
+      slug: article.slug,
+      title: article.title,
+      category: article.category,
+      description: article.metaDescription,
+      keywords: article.keywords,
+    } : undefined,
+  })
+}
+
+function SEO() {
+  const { pathname } = useLocation()
+  const data = getPageMetadata(pathname)
+  useEffect(() => {
+    document.title = data.title
+    const setMeta = (key: string, value: string, property = false) => {
+      const selector = property ? `meta[property="${key}"]` : `meta[name="${key}"]`
+      let element = document.querySelector<HTMLMetaElement>(selector)
+      if (!element) {
+        element = document.createElement('meta')
+        if (property) element.setAttribute('property', key)
+        else element.name = key
+        document.head.append(element)
+      }
+      element.content = value
+    }
+    setMeta('description', data.description)
+    setMeta('og:title', data.title, true)
+    setMeta('og:description', data.description, true)
+    setMeta('og:type', 'website', true)
+    setMeta('og:site_name', 'CAP Technology', true)
+    setMeta('og:url', window.location.origin + pathname, true)
+    setMeta('twitter:card', 'summary_large_image')
+    setMeta('twitter:title', data.title)
+    setMeta('twitter:description', data.description)
+    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.rel = 'canonical'
+      document.head.append(canonical)
+    }
+    canonical.href = window.location.origin + pathname
+    let schema = document.querySelector<HTMLScriptElement>('#cap-schema')
+    if (!schema) {
+      schema = document.createElement('script')
+      schema.id = 'cap-schema'
+      schema.type = 'application/ld+json'
+      document.head.append(schema)
+    }
+    schema.textContent = JSON.stringify(getPageSchema(pathname, window.location.origin))
+  }, [pathname, data.title, data.description])
+  return null
+}
+
+export function App({ initialBlogPosts = EMPTY_BLOG_POSTS }: { initialBlogPosts?: BlogPost[] } = {}) {
+  const loc = useLocation()
+  return <><SEO/><DeferredSplashCursor/><div id="top"/><Header/><Routes><Route path="/" element={<Home/>}/><Route path="/about" element={<About/>}/><Route path="/services" element={<Services/>}/><Route path="/services/:slug" element={<ServiceDetail/>}/><Route path="/customers" element={<Customers/>}/><Route path="/blog/:slug" element={<BlogArticle initialBlogPosts={initialBlogPosts}/>}/><Route path="/blog" element={<Blog/>}/><Route path="/careers" element={<Careers/>}/><Route path="/contact" element={<Contact/>}/><Route path="*" element={<Home/>}/></Routes><Footer/><a href="#top" className="back-top" aria-label="Back to top"><MousePointer2 size={17}/></a>{loc.pathname==='/'&&<div className="floating-star" aria-hidden="true">*</div>}</>
+}
 
 export default App
