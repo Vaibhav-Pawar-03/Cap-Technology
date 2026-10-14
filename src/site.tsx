@@ -184,6 +184,9 @@ function SEO() {
 
 export function App({ initialBlogPosts = EMPTY_BLOG_POSTS }: { initialBlogPosts?: BlogPost[] } = {}) {
   const loc = useLocation()
+  useEffect(() => {
+    if (!loc.hash) window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [loc.pathname, loc.hash])
   return <><SEO/><DeferredSplashCursor/><div id="top"/><Header/><Routes><Route path="/" element={<Home/>}/><Route path="/about" element={<About/>}/><Route path="/services" element={<Services/>}/><Route path="/services/:slug" element={<ServiceDetail/>}/><Route path="/customers" element={<Customers/>}/><Route path="/blog/:slug" element={<BlogArticle initialBlogPosts={initialBlogPosts}/>}/><Route path="/blog" element={<Blog/>}/><Route path="/careers" element={<Careers/>}/><Route path="/contact" element={<Contact/>}/><Route path="*" element={<Home/>}/></Routes><Footer/><a href="#top" className="back-top" aria-label="Back to top"><MousePointer2 size={17}/></a>{loc.pathname==='/'&&<div className="floating-star" aria-hidden="true">*</div>}</>
 }
 
